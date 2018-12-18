@@ -1,0 +1,780 @@
+
+## Get the data
+
+
+```python
+import requests
+
+url = "https://ndownloader.figshare.com/files/2292171"
+r = requests.get(url)
+
+with open('portals_mammal.sqlite', 'wb') as f:
+    f.write(r.content)
+```
+
+## Connecting to the database
+
+
+```python
+import sqlite3
+con= sqlite3.connect('portals_mammal.sqlite')
+```
+
+
+```python
+type(con)
+```
+
+
+
+
+    sqlite3.Connection
+
+
+
+
+```python
+cursor = con.cursor()
+cursor.execute("select year, species_id, plot_id from surveys")
+```
+
+
+
+
+    <sqlite3.Cursor at 0x21ebec2f570>
+
+
+
+
+```python
+row1 = cursor.fetchone()
+print(row1)
+```
+
+    (1977, 'NL', 3)
+    
+
+
+```python
+print(" The first value is", row1[0])
+```
+
+     The first value is 1977
+    
+
+
+```python
+cursor.execute("select year, species_id, plot_id from surveys limit 10")
+all_rows = cursor.fetchall()
+for row in all_rows:
+    print(row)
+```
+
+    (1977, 'NL', 2)
+    (1977, 'NL', 3)
+    (1977, 'DM', 2)
+    (1977, 'DM', 7)
+    (1977, 'DM', 3)
+    (1977, 'PF', 1)
+    (1977, 'PE', 2)
+    (1977, 'DM', 1)
+    (1977, 'DM', 1)
+    (1977, 'PF', 6)
+    
+
+
+```python
+sql = """
+select surveys.year, surveys.month, surveys.day, species.genus, species.species
+from surveys
+join species
+on surveys.species_id = species.species_id
+where species.species = "flavus"
+and surveys.year > 2000
+"""
+
+cursor.execute(sql)
+for row in cursor:
+    print(row)
+```
+
+    (2002, 2, 9, 'Perognathus', 'flavus')
+    (2002, 2, 10, 'Perognathus', 'flavus')
+    (2002, 3, 14, 'Perognathus', 'flavus')
+    (2002, 3, 14, 'Perognathus', 'flavus')
+    (2002, 3, 14, 'Perognathus', 'flavus')
+    (2002, 3, 14, 'Perognathus', 'flavus')
+    (2001, 3, 25, 'Perognathus', 'flavus')
+    (2002, 4, 17, 'Perognathus', 'flavus')
+    (2002, 4, 17, 'Perognathus', 'flavus')
+    (2001, 4, 21, 'Perognathus', 'flavus')
+    (2001, 4, 22, 'Perognathus', 'flavus')
+    (2001, 4, 22, 'Perognathus', 'flavus')
+    (2002, 5, 16, 'Perognathus', 'flavus')
+    (2002, 5, 16, 'Perognathus', 'flavus')
+    (2001, 5, 27, 'Perognathus', 'flavus')
+    (2001, 5, 27, 'Perognathus', 'flavus')
+    (2002, 6, 16, 'Perognathus', 'flavus')
+    (2001, 6, 25, 'Perognathus', 'flavus')
+    (2001, 6, 25, 'Perognathus', 'flavus')
+    (2001, 6, 25, 'Perognathus', 'flavus')
+    (2002, 7, 14, 'Perognathus', 'flavus')
+    (2001, 7, 22, 'Perognathus', 'flavus')
+    (2001, 7, 22, 'Perognathus', 'flavus')
+    (2001, 8, 25, 'Perognathus', 'flavus')
+    (2001, 8, 25, 'Perognathus', 'flavus')
+    (2001, 8, 25, 'Perognathus', 'flavus')
+    (2001, 8, 26, 'Perognathus', 'flavus')
+    (2001, 8, 26, 'Perognathus', 'flavus')
+    (2001, 9, 22, 'Perognathus', 'flavus')
+    (2001, 9, 23, 'Perognathus', 'flavus')
+    (2002, 10, 6, 'Perognathus', 'flavus')
+    (2001, 10, 13, 'Perognathus', 'flavus')
+    (2001, 10, 14, 'Perognathus', 'flavus')
+    (2001, 10, 14, 'Perognathus', 'flavus')
+    (2001, 10, 14, 'Perognathus', 'flavus')
+    (2001, 10, 14, 'Perognathus', 'flavus')
+    (2001, 10, 14, 'Perognathus', 'flavus')
+    (2001, 10, 14, 'Perognathus', 'flavus')
+    (2001, 10, 14, 'Perognathus', 'flavus')
+    (2002, 11, 10, 'Perognathus', 'flavus')
+    (2002, 11, 10, 'Perognathus', 'flavus')
+    (2001, 11, 18, 'Perognathus', 'flavus')
+    (2002, 12, 8, 'Perognathus', 'flavus')
+    (2002, 12, 8, 'Perognathus', 'flavus')
+    (2002, 12, 31, 'Perognathus', 'flavus')
+    
+
+
+```python
+sql = """
+select surveys.year, surveys.month, surveys.day, species.genus, species.species
+from surveys
+join species
+on surveys.species_id = species.species_id
+where species.species = "flavus"
+and surveys.year in (1996, 1997, 1998)
+"""
+
+cursor.execute(sql)
+for row in cursor:
+    print(row)
+```
+
+    (1996, 1, 27, 'Perognathus', 'flavus')
+    (1996, 1, 27, 'Perognathus', 'flavus')
+    (1996, 1, 27, 'Perognathus', 'flavus')
+    (1996, 1, 27, 'Perognathus', 'flavus')
+    (1996, 1, 27, 'Perognathus', 'flavus')
+    (1996, 1, 27, 'Perognathus', 'flavus')
+    (1996, 1, 27, 'Perognathus', 'flavus')
+    (1996, 1, 28, 'Perognathus', 'flavus')
+    (1996, 1, 28, 'Perognathus', 'flavus')
+    (1996, 1, 28, 'Perognathus', 'flavus')
+    (1996, 1, 28, 'Perognathus', 'flavus')
+    (1996, 1, 28, 'Perognathus', 'flavus')
+    (1996, 1, 28, 'Perognathus', 'flavus')
+    (1996, 1, 28, 'Perognathus', 'flavus')
+    (1996, 1, 28, 'Perognathus', 'flavus')
+    (1996, 1, 28, 'Perognathus', 'flavus')
+    (1996, 1, 28, 'Perognathus', 'flavus')
+    (1996, 1, 28, 'Perognathus', 'flavus')
+    (1996, 1, 28, 'Perognathus', 'flavus')
+    (1996, 1, 28, 'Perognathus', 'flavus')
+    (1996, 1, 28, 'Perognathus', 'flavus')
+    (1996, 1, 28, 'Perognathus', 'flavus')
+    (1996, 1, 28, 'Perognathus', 'flavus')
+    (1996, 1, 28, 'Perognathus', 'flavus')
+    (1997, 2, 8, 'Perognathus', 'flavus')
+    (1997, 2, 8, 'Perognathus', 'flavus')
+    (1997, 2, 8, 'Perognathus', 'flavus')
+    (1997, 2, 8, 'Perognathus', 'flavus')
+    (1997, 2, 8, 'Perognathus', 'flavus')
+    (1997, 2, 8, 'Perognathus', 'flavus')
+    (1997, 2, 8, 'Perognathus', 'flavus')
+    (1997, 2, 8, 'Perognathus', 'flavus')
+    (1997, 2, 8, 'Perognathus', 'flavus')
+    (1997, 2, 8, 'Perognathus', 'flavus')
+    (1997, 2, 8, 'Perognathus', 'flavus')
+    (1997, 2, 9, 'Perognathus', 'flavus')
+    (1997, 2, 9, 'Perognathus', 'flavus')
+    (1997, 2, 9, 'Perognathus', 'flavus')
+    (1997, 2, 9, 'Perognathus', 'flavus')
+    (1997, 2, 9, 'Perognathus', 'flavus')
+    (1997, 2, 9, 'Perognathus', 'flavus')
+    (1997, 2, 9, 'Perognathus', 'flavus')
+    (1997, 2, 9, 'Perognathus', 'flavus')
+    (1997, 2, 9, 'Perognathus', 'flavus')
+    (1997, 2, 9, 'Perognathus', 'flavus')
+    (1996, 2, 24, 'Perognathus', 'flavus')
+    (1996, 2, 24, 'Perognathus', 'flavus')
+    (1996, 2, 24, 'Perognathus', 'flavus')
+    (1996, 2, 24, 'Perognathus', 'flavus')
+    (1996, 2, 24, 'Perognathus', 'flavus')
+    (1996, 2, 24, 'Perognathus', 'flavus')
+    (1996, 2, 24, 'Perognathus', 'flavus')
+    (1996, 2, 24, 'Perognathus', 'flavus')
+    (1996, 2, 24, 'Perognathus', 'flavus')
+    (1996, 2, 24, 'Perognathus', 'flavus')
+    (1996, 2, 25, 'Perognathus', 'flavus')
+    (1996, 2, 25, 'Perognathus', 'flavus')
+    (1996, 2, 25, 'Perognathus', 'flavus')
+    (1996, 2, 25, 'Perognathus', 'flavus')
+    (1996, 2, 25, 'Perognathus', 'flavus')
+    (1996, 2, 25, 'Perognathus', 'flavus')
+    (1996, 2, 25, 'Perognathus', 'flavus')
+    (1996, 2, 25, 'Perognathus', 'flavus')
+    (1996, 2, 25, 'Perognathus', 'flavus')
+    (1996, 2, 25, 'Perognathus', 'flavus')
+    (1996, 2, 25, 'Perognathus', 'flavus')
+    (1996, 2, 25, 'Perognathus', 'flavus')
+    (1996, 2, 25, 'Perognathus', 'flavus')
+    (1996, 2, 25, 'Perognathus', 'flavus')
+    (1996, 2, 25, 'Perognathus', 'flavus')
+    (1996, 2, 25, 'Perognathus', 'flavus')
+    (1996, 2, 25, 'Perognathus', 'flavus')
+    (1996, 2, 25, 'Perognathus', 'flavus')
+    (1996, 2, 25, 'Perognathus', 'flavus')
+    (1996, 2, 25, 'Perognathus', 'flavus')
+    (1996, 2, 25, 'Perognathus', 'flavus')
+    (1996, 2, 25, 'Perognathus', 'flavus')
+    (1996, 2, 25, 'Perognathus', 'flavus')
+    (1996, 2, 25, 'Perognathus', 'flavus')
+    (1997, 3, 15, 'Perognathus', 'flavus')
+    (1997, 3, 15, 'Perognathus', 'flavus')
+    (1997, 3, 15, 'Perognathus', 'flavus')
+    (1997, 3, 15, 'Perognathus', 'flavus')
+    (1997, 3, 15, 'Perognathus', 'flavus')
+    (1997, 3, 15, 'Perognathus', 'flavus')
+    (1997, 3, 15, 'Perognathus', 'flavus')
+    (1997, 3, 15, 'Perognathus', 'flavus')
+    (1997, 3, 15, 'Perognathus', 'flavus')
+    (1997, 3, 15, 'Perognathus', 'flavus')
+    (1997, 3, 15, 'Perognathus', 'flavus')
+    (1997, 3, 15, 'Perognathus', 'flavus')
+    (1997, 3, 15, 'Perognathus', 'flavus')
+    (1997, 3, 15, 'Perognathus', 'flavus')
+    (1997, 3, 15, 'Perognathus', 'flavus')
+    (1997, 3, 15, 'Perognathus', 'flavus')
+    (1997, 3, 15, 'Perognathus', 'flavus')
+    (1997, 3, 16, 'Perognathus', 'flavus')
+    (1997, 3, 16, 'Perognathus', 'flavus')
+    (1997, 3, 16, 'Perognathus', 'flavus')
+    (1997, 3, 16, 'Perognathus', 'flavus')
+    (1997, 3, 16, 'Perognathus', 'flavus')
+    (1997, 3, 16, 'Perognathus', 'flavus')
+    (1997, 3, 16, 'Perognathus', 'flavus')
+    (1997, 3, 16, 'Perognathus', 'flavus')
+    (1997, 3, 16, 'Perognathus', 'flavus')
+    (1997, 3, 16, 'Perognathus', 'flavus')
+    (1997, 3, 16, 'Perognathus', 'flavus')
+    (1997, 3, 16, 'Perognathus', 'flavus')
+    (1997, 3, 16, 'Perognathus', 'flavus')
+    (1997, 3, 16, 'Perognathus', 'flavus')
+    (1997, 3, 16, 'Perognathus', 'flavus')
+    (1997, 3, 16, 'Perognathus', 'flavus')
+    (1997, 3, 16, 'Perognathus', 'flavus')
+    (1996, 3, 23, 'Perognathus', 'flavus')
+    (1996, 3, 23, 'Perognathus', 'flavus')
+    (1996, 3, 23, 'Perognathus', 'flavus')
+    (1996, 3, 23, 'Perognathus', 'flavus')
+    (1996, 3, 23, 'Perognathus', 'flavus')
+    (1996, 3, 23, 'Perognathus', 'flavus')
+    (1996, 3, 23, 'Perognathus', 'flavus')
+    (1996, 3, 23, 'Perognathus', 'flavus')
+    (1996, 3, 23, 'Perognathus', 'flavus')
+    (1996, 3, 23, 'Perognathus', 'flavus')
+    (1996, 3, 23, 'Perognathus', 'flavus')
+    (1996, 3, 23, 'Perognathus', 'flavus')
+    (1996, 3, 23, 'Perognathus', 'flavus')
+    (1996, 3, 23, 'Perognathus', 'flavus')
+    (1996, 3, 23, 'Perognathus', 'flavus')
+    (1996, 3, 23, 'Perognathus', 'flavus')
+    (1996, 3, 23, 'Perognathus', 'flavus')
+    (1996, 3, 23, 'Perognathus', 'flavus')
+    (1996, 3, 23, 'Perognathus', 'flavus')
+    (1996, 3, 23, 'Perognathus', 'flavus')
+    (1996, 3, 23, 'Perognathus', 'flavus')
+    (1996, 3, 24, 'Perognathus', 'flavus')
+    (1996, 3, 24, 'Perognathus', 'flavus')
+    (1996, 3, 24, 'Perognathus', 'flavus')
+    (1996, 3, 24, 'Perognathus', 'flavus')
+    (1998, 3, 29, 'Perognathus', 'flavus')
+    (1997, 4, 12, 'Perognathus', 'flavus')
+    (1997, 4, 12, 'Perognathus', 'flavus')
+    (1997, 4, 12, 'Perognathus', 'flavus')
+    (1997, 4, 12, 'Perognathus', 'flavus')
+    (1997, 4, 12, 'Perognathus', 'flavus')
+    (1997, 4, 12, 'Perognathus', 'flavus')
+    (1997, 4, 12, 'Perognathus', 'flavus')
+    (1997, 4, 12, 'Perognathus', 'flavus')
+    (1997, 4, 12, 'Perognathus', 'flavus')
+    (1997, 4, 12, 'Perognathus', 'flavus')
+    (1997, 4, 12, 'Perognathus', 'flavus')
+    (1997, 4, 12, 'Perognathus', 'flavus')
+    (1997, 4, 12, 'Perognathus', 'flavus')
+    (1997, 4, 12, 'Perognathus', 'flavus')
+    (1997, 4, 12, 'Perognathus', 'flavus')
+    (1997, 4, 13, 'Perognathus', 'flavus')
+    (1997, 4, 13, 'Perognathus', 'flavus')
+    (1997, 4, 13, 'Perognathus', 'flavus')
+    (1997, 4, 13, 'Perognathus', 'flavus')
+    (1997, 4, 13, 'Perognathus', 'flavus')
+    (1997, 4, 13, 'Perognathus', 'flavus')
+    (1997, 4, 13, 'Perognathus', 'flavus')
+    (1997, 4, 13, 'Perognathus', 'flavus')
+    (1997, 4, 13, 'Perognathus', 'flavus')
+    (1997, 4, 13, 'Perognathus', 'flavus')
+    (1997, 4, 13, 'Perognathus', 'flavus')
+    (1997, 4, 13, 'Perognathus', 'flavus')
+    (1997, 4, 13, 'Perognathus', 'flavus')
+    (1997, 4, 13, 'Perognathus', 'flavus')
+    (1997, 4, 13, 'Perognathus', 'flavus')
+    (1997, 4, 13, 'Perognathus', 'flavus')
+    (1996, 4, 14, 'Perognathus', 'flavus')
+    (1996, 4, 14, 'Perognathus', 'flavus')
+    (1996, 4, 14, 'Perognathus', 'flavus')
+    (1996, 4, 14, 'Perognathus', 'flavus')
+    (1996, 4, 14, 'Perognathus', 'flavus')
+    (1996, 4, 14, 'Perognathus', 'flavus')
+    (1996, 4, 14, 'Perognathus', 'flavus')
+    (1996, 4, 14, 'Perognathus', 'flavus')
+    (1996, 4, 14, 'Perognathus', 'flavus')
+    (1996, 4, 14, 'Perognathus', 'flavus')
+    (1996, 4, 14, 'Perognathus', 'flavus')
+    (1996, 4, 14, 'Perognathus', 'flavus')
+    (1996, 4, 14, 'Perognathus', 'flavus')
+    (1996, 4, 14, 'Perognathus', 'flavus')
+    (1996, 4, 14, 'Perognathus', 'flavus')
+    (1996, 4, 14, 'Perognathus', 'flavus')
+    (1996, 4, 14, 'Perognathus', 'flavus')
+    (1996, 4, 14, 'Perognathus', 'flavus')
+    (1996, 4, 14, 'Perognathus', 'flavus')
+    (1996, 4, 14, 'Perognathus', 'flavus')
+    (1996, 4, 14, 'Perognathus', 'flavus')
+    (1996, 4, 14, 'Perognathus', 'flavus')
+    (1996, 4, 15, 'Perognathus', 'flavus')
+    (1996, 4, 15, 'Perognathus', 'flavus')
+    (1996, 4, 15, 'Perognathus', 'flavus')
+    (1996, 4, 15, 'Perognathus', 'flavus')
+    (1996, 4, 15, 'Perognathus', 'flavus')
+    (1996, 4, 15, 'Perognathus', 'flavus')
+    (1996, 4, 15, 'Perognathus', 'flavus')
+    (1996, 4, 15, 'Perognathus', 'flavus')
+    (1996, 4, 15, 'Perognathus', 'flavus')
+    (1996, 4, 15, 'Perognathus', 'flavus')
+    (1996, 4, 15, 'Perognathus', 'flavus')
+    (1996, 4, 15, 'Perognathus', 'flavus')
+    (1996, 4, 15, 'Perognathus', 'flavus')
+    (1996, 4, 15, 'Perognathus', 'flavus')
+    (1996, 4, 15, 'Perognathus', 'flavus')
+    (1996, 4, 15, 'Perognathus', 'flavus')
+    (1996, 4, 15, 'Perognathus', 'flavus')
+    (1996, 4, 15, 'Perognathus', 'flavus')
+    (1996, 4, 15, 'Perognathus', 'flavus')
+    (1996, 4, 15, 'Perognathus', 'flavus')
+    (1996, 4, 15, 'Perognathus', 'flavus')
+    (1996, 4, 15, 'Perognathus', 'flavus')
+    (1996, 4, 15, 'Perognathus', 'flavus')
+    (1996, 4, 15, 'Perognathus', 'flavus')
+    (1996, 4, 15, 'Perognathus', 'flavus')
+    (1996, 4, 15, 'Perognathus', 'flavus')
+    (1996, 4, 15, 'Perognathus', 'flavus')
+    (1996, 4, 15, 'Perognathus', 'flavus')
+    (1996, 4, 15, 'Perognathus', 'flavus')
+    (1996, 4, 15, 'Perognathus', 'flavus')
+    (1996, 4, 15, 'Perognathus', 'flavus')
+    (1996, 4, 15, 'Perognathus', 'flavus')
+    (1996, 4, 15, 'Perognathus', 'flavus')
+    (1996, 4, 15, 'Perognathus', 'flavus')
+    (1996, 4, 15, 'Perognathus', 'flavus')
+    (1996, 4, 15, 'Perognathus', 'flavus')
+    (1998, 5, 2, 'Perognathus', 'flavus')
+    (1997, 5, 10, 'Perognathus', 'flavus')
+    (1997, 5, 10, 'Perognathus', 'flavus')
+    (1997, 5, 10, 'Perognathus', 'flavus')
+    (1997, 5, 10, 'Perognathus', 'flavus')
+    (1997, 5, 10, 'Perognathus', 'flavus')
+    (1997, 5, 10, 'Perognathus', 'flavus')
+    (1997, 5, 10, 'Perognathus', 'flavus')
+    (1997, 5, 10, 'Perognathus', 'flavus')
+    (1997, 5, 10, 'Perognathus', 'flavus')
+    (1997, 5, 10, 'Perognathus', 'flavus')
+    (1997, 5, 10, 'Perognathus', 'flavus')
+    (1997, 5, 10, 'Perognathus', 'flavus')
+    (1997, 5, 10, 'Perognathus', 'flavus')
+    (1997, 5, 10, 'Perognathus', 'flavus')
+    (1997, 5, 11, 'Perognathus', 'flavus')
+    (1997, 5, 11, 'Perognathus', 'flavus')
+    (1997, 5, 11, 'Perognathus', 'flavus')
+    (1997, 5, 11, 'Perognathus', 'flavus')
+    (1997, 5, 11, 'Perognathus', 'flavus')
+    (1997, 5, 11, 'Perognathus', 'flavus')
+    (1997, 5, 11, 'Perognathus', 'flavus')
+    (1996, 5, 23, 'Perognathus', 'flavus')
+    (1996, 5, 23, 'Perognathus', 'flavus')
+    (1996, 5, 23, 'Perognathus', 'flavus')
+    (1996, 5, 23, 'Perognathus', 'flavus')
+    (1996, 5, 23, 'Perognathus', 'flavus')
+    (1996, 5, 23, 'Perognathus', 'flavus')
+    (1996, 5, 23, 'Perognathus', 'flavus')
+    (1996, 5, 23, 'Perognathus', 'flavus')
+    (1996, 5, 23, 'Perognathus', 'flavus')
+    (1996, 5, 23, 'Perognathus', 'flavus')
+    (1996, 5, 23, 'Perognathus', 'flavus')
+    (1996, 5, 23, 'Perognathus', 'flavus')
+    (1996, 5, 23, 'Perognathus', 'flavus')
+    (1996, 5, 23, 'Perognathus', 'flavus')
+    (1996, 5, 23, 'Perognathus', 'flavus')
+    (1996, 5, 24, 'Perognathus', 'flavus')
+    (1996, 5, 24, 'Perognathus', 'flavus')
+    (1996, 5, 24, 'Perognathus', 'flavus')
+    (1996, 5, 24, 'Perognathus', 'flavus')
+    (1996, 5, 24, 'Perognathus', 'flavus')
+    (1996, 5, 24, 'Perognathus', 'flavus')
+    (1996, 5, 24, 'Perognathus', 'flavus')
+    (1996, 5, 24, 'Perognathus', 'flavus')
+    (1996, 5, 24, 'Perognathus', 'flavus')
+    (1996, 5, 24, 'Perognathus', 'flavus')
+    (1996, 5, 24, 'Perognathus', 'flavus')
+    (1996, 5, 24, 'Perognathus', 'flavus')
+    (1996, 5, 24, 'Perognathus', 'flavus')
+    (1996, 5, 24, 'Perognathus', 'flavus')
+    (1996, 5, 24, 'Perognathus', 'flavus')
+    (1996, 5, 24, 'Perognathus', 'flavus')
+    (1996, 5, 24, 'Perognathus', 'flavus')
+    (1996, 5, 24, 'Perognathus', 'flavus')
+    (1996, 5, 24, 'Perognathus', 'flavus')
+    (1996, 5, 24, 'Perognathus', 'flavus')
+    (1998, 5, 28, 'Perognathus', 'flavus')
+    (1998, 5, 28, 'Perognathus', 'flavus')
+    (1998, 5, 28, 'Perognathus', 'flavus')
+    (1998, 5, 28, 'Perognathus', 'flavus')
+    (1998, 5, 28, 'Perognathus', 'flavus')
+    (1998, 5, 29, 'Perognathus', 'flavus')
+    (1998, 5, 29, 'Perognathus', 'flavus')
+    (1997, 6, 9, 'Perognathus', 'flavus')
+    (1997, 6, 9, 'Perognathus', 'flavus')
+    (1997, 6, 9, 'Perognathus', 'flavus')
+    (1997, 6, 9, 'Perognathus', 'flavus')
+    (1997, 6, 9, 'Perognathus', 'flavus')
+    (1997, 6, 9, 'Perognathus', 'flavus')
+    (1997, 6, 9, 'Perognathus', 'flavus')
+    (1997, 6, 9, 'Perognathus', 'flavus')
+    (1997, 6, 10, 'Perognathus', 'flavus')
+    (1997, 6, 10, 'Perognathus', 'flavus')
+    (1997, 6, 10, 'Perognathus', 'flavus')
+    (1997, 6, 11, 'Perognathus', 'flavus')
+    (1997, 6, 11, 'Perognathus', 'flavus')
+    (1997, 6, 11, 'Perognathus', 'flavus')
+    (1997, 6, 11, 'Perognathus', 'flavus')
+    (1997, 6, 11, 'Perognathus', 'flavus')
+    (1996, 6, 13, 'Perognathus', 'flavus')
+    (1996, 6, 13, 'Perognathus', 'flavus')
+    (1996, 6, 13, 'Perognathus', 'flavus')
+    (1996, 6, 13, 'Perognathus', 'flavus')
+    (1996, 6, 13, 'Perognathus', 'flavus')
+    (1996, 6, 13, 'Perognathus', 'flavus')
+    (1996, 6, 13, 'Perognathus', 'flavus')
+    (1996, 6, 13, 'Perognathus', 'flavus')
+    (1996, 6, 13, 'Perognathus', 'flavus')
+    (1996, 6, 13, 'Perognathus', 'flavus')
+    (1996, 6, 13, 'Perognathus', 'flavus')
+    (1996, 6, 13, 'Perognathus', 'flavus')
+    (1996, 6, 13, 'Perognathus', 'flavus')
+    (1996, 6, 13, 'Perognathus', 'flavus')
+    (1996, 6, 13, 'Perognathus', 'flavus')
+    (1996, 6, 13, 'Perognathus', 'flavus')
+    (1996, 6, 13, 'Perognathus', 'flavus')
+    (1996, 6, 13, 'Perognathus', 'flavus')
+    (1996, 6, 14, 'Perognathus', 'flavus')
+    (1996, 6, 14, 'Perognathus', 'flavus')
+    (1996, 6, 14, 'Perognathus', 'flavus')
+    (1996, 6, 14, 'Perognathus', 'flavus')
+    (1996, 6, 14, 'Perognathus', 'flavus')
+    (1996, 6, 14, 'Perognathus', 'flavus')
+    (1996, 6, 14, 'Perognathus', 'flavus')
+    (1996, 6, 14, 'Perognathus', 'flavus')
+    (1996, 6, 14, 'Perognathus', 'flavus')
+    (1996, 6, 14, 'Perognathus', 'flavus')
+    (1996, 6, 14, 'Perognathus', 'flavus')
+    (1996, 6, 14, 'Perognathus', 'flavus')
+    (1996, 6, 14, 'Perognathus', 'flavus')
+    (1996, 6, 14, 'Perognathus', 'flavus')
+    (1996, 6, 14, 'Perognathus', 'flavus')
+    (1996, 6, 14, 'Perognathus', 'flavus')
+    (1996, 6, 14, 'Perognathus', 'flavus')
+    (1996, 6, 14, 'Perognathus', 'flavus')
+    (1998, 6, 27, 'Perognathus', 'flavus')
+    (1998, 6, 27, 'Perognathus', 'flavus')
+    (1998, 6, 27, 'Perognathus', 'flavus')
+    (1998, 6, 27, 'Perognathus', 'flavus')
+    (1998, 6, 28, 'Perognathus', 'flavus')
+    (1998, 6, 28, 'Perognathus', 'flavus')
+    (1998, 6, 28, 'Perognathus', 'flavus')
+    (1997, 7, 9, 'Perognathus', 'flavus')
+    (1997, 7, 9, 'Perognathus', 'flavus')
+    (1997, 7, 9, 'Perognathus', 'flavus')
+    (1997, 7, 9, 'Perognathus', 'flavus')
+    (1997, 7, 9, 'Perognathus', 'flavus')
+    (1997, 7, 9, 'Perognathus', 'flavus')
+    (1997, 7, 9, 'Perognathus', 'flavus')
+    (1997, 7, 9, 'Perognathus', 'flavus')
+    (1997, 7, 9, 'Perognathus', 'flavus')
+    (1997, 7, 9, 'Perognathus', 'flavus')
+    (1997, 7, 9, 'Perognathus', 'flavus')
+    (1997, 7, 9, 'Perognathus', 'flavus')
+    (1997, 7, 9, 'Perognathus', 'flavus')
+    (1997, 7, 9, 'Perognathus', 'flavus')
+    (1997, 7, 9, 'Perognathus', 'flavus')
+    (1997, 7, 9, 'Perognathus', 'flavus')
+    (1997, 7, 9, 'Perognathus', 'flavus')
+    (1997, 7, 9, 'Perognathus', 'flavus')
+    (1997, 7, 9, 'Perognathus', 'flavus')
+    (1997, 7, 9, 'Perognathus', 'flavus')
+    (1997, 7, 9, 'Perognathus', 'flavus')
+    (1997, 7, 9, 'Perognathus', 'flavus')
+    (1997, 7, 9, 'Perognathus', 'flavus')
+    (1997, 7, 9, 'Perognathus', 'flavus')
+    (1997, 7, 9, 'Perognathus', 'flavus')
+    (1998, 7, 18, 'Perognathus', 'flavus')
+    (1998, 7, 18, 'Perognathus', 'flavus')
+    (1998, 7, 18, 'Perognathus', 'flavus')
+    (1998, 7, 18, 'Perognathus', 'flavus')
+    (1998, 7, 18, 'Perognathus', 'flavus')
+    (1998, 7, 18, 'Perognathus', 'flavus')
+    (1996, 7, 20, 'Perognathus', 'flavus')
+    (1996, 7, 20, 'Perognathus', 'flavus')
+    (1996, 7, 20, 'Perognathus', 'flavus')
+    (1996, 7, 20, 'Perognathus', 'flavus')
+    (1996, 7, 20, 'Perognathus', 'flavus')
+    (1996, 7, 20, 'Perognathus', 'flavus')
+    (1996, 7, 20, 'Perognathus', 'flavus')
+    (1996, 7, 20, 'Perognathus', 'flavus')
+    (1996, 7, 20, 'Perognathus', 'flavus')
+    (1996, 7, 20, 'Perognathus', 'flavus')
+    (1996, 7, 20, 'Perognathus', 'flavus')
+    (1996, 7, 20, 'Perognathus', 'flavus')
+    (1996, 7, 21, 'Perognathus', 'flavus')
+    (1996, 7, 21, 'Perognathus', 'flavus')
+    (1996, 7, 21, 'Perognathus', 'flavus')
+    (1996, 7, 21, 'Perognathus', 'flavus')
+    (1996, 7, 21, 'Perognathus', 'flavus')
+    (1996, 7, 21, 'Perognathus', 'flavus')
+    (1996, 7, 21, 'Perognathus', 'flavus')
+    (1996, 7, 21, 'Perognathus', 'flavus')
+    (1996, 7, 21, 'Perognathus', 'flavus')
+    (1997, 7, 29, 'Perognathus', 'flavus')
+    (1997, 7, 29, 'Perognathus', 'flavus')
+    (1997, 7, 29, 'Perognathus', 'flavus')
+    (1997, 7, 29, 'Perognathus', 'flavus')
+    (1997, 7, 29, 'Perognathus', 'flavus')
+    (1997, 7, 29, 'Perognathus', 'flavus')
+    (1997, 7, 29, 'Perognathus', 'flavus')
+    (1997, 7, 29, 'Perognathus', 'flavus')
+    (1997, 7, 29, 'Perognathus', 'flavus')
+    (1997, 7, 29, 'Perognathus', 'flavus')
+    (1997, 7, 29, 'Perognathus', 'flavus')
+    (1997, 7, 29, 'Perognathus', 'flavus')
+    (1997, 7, 29, 'Perognathus', 'flavus')
+    (1997, 7, 30, 'Perognathus', 'flavus')
+    (1997, 7, 30, 'Perognathus', 'flavus')
+    (1997, 7, 30, 'Perognathus', 'flavus')
+    (1997, 7, 30, 'Perognathus', 'flavus')
+    (1997, 7, 30, 'Perognathus', 'flavus')
+    (1997, 7, 30, 'Perognathus', 'flavus')
+    (1997, 7, 30, 'Perognathus', 'flavus')
+    (1997, 7, 30, 'Perognathus', 'flavus')
+    (1997, 7, 30, 'Perognathus', 'flavus')
+    (1997, 7, 30, 'Perognathus', 'flavus')
+    (1996, 8, 14, 'Perognathus', 'flavus')
+    (1996, 8, 14, 'Perognathus', 'flavus')
+    (1996, 8, 14, 'Perognathus', 'flavus')
+    (1996, 8, 14, 'Perognathus', 'flavus')
+    (1996, 8, 15, 'Perognathus', 'flavus')
+    (1996, 8, 15, 'Perognathus', 'flavus')
+    (1996, 8, 15, 'Perognathus', 'flavus')
+    (1996, 8, 15, 'Perognathus', 'flavus')
+    (1996, 8, 15, 'Perognathus', 'flavus')
+    (1996, 8, 15, 'Perognathus', 'flavus')
+    (1996, 8, 15, 'Perognathus', 'flavus')
+    (1996, 8, 15, 'Perognathus', 'flavus')
+    (1996, 8, 15, 'Perognathus', 'flavus')
+    (1998, 8, 22, 'Perognathus', 'flavus')
+    (1998, 8, 22, 'Perognathus', 'flavus')
+    (1998, 8, 22, 'Perognathus', 'flavus')
+    (1998, 9, 19, 'Perognathus', 'flavus')
+    (1996, 9, 21, 'Perognathus', 'flavus')
+    (1996, 9, 21, 'Perognathus', 'flavus')
+    (1996, 9, 21, 'Perognathus', 'flavus')
+    (1996, 9, 21, 'Perognathus', 'flavus')
+    (1996, 9, 21, 'Perognathus', 'flavus')
+    (1996, 9, 21, 'Perognathus', 'flavus')
+    (1996, 9, 21, 'Perognathus', 'flavus')
+    (1996, 9, 21, 'Perognathus', 'flavus')
+    (1996, 9, 21, 'Perognathus', 'flavus')
+    (1996, 9, 22, 'Perognathus', 'flavus')
+    (1996, 9, 22, 'Perognathus', 'flavus')
+    (1996, 9, 22, 'Perognathus', 'flavus')
+    (1996, 9, 22, 'Perognathus', 'flavus')
+    (1996, 9, 22, 'Perognathus', 'flavus')
+    (1996, 9, 22, 'Perognathus', 'flavus')
+    (1996, 9, 22, 'Perognathus', 'flavus')
+    (1996, 9, 22, 'Perognathus', 'flavus')
+    (1996, 9, 22, 'Perognathus', 'flavus')
+    (1996, 9, 22, 'Perognathus', 'flavus')
+    (1996, 9, 22, 'Perognathus', 'flavus')
+    (1996, 9, 22, 'Perognathus', 'flavus')
+    (1996, 9, 22, 'Perognathus', 'flavus')
+    (1996, 9, 22, 'Perognathus', 'flavus')
+    (1996, 9, 22, 'Perognathus', 'flavus')
+    (1996, 9, 22, 'Perognathus', 'flavus')
+    (1997, 9, 27, 'Perognathus', 'flavus')
+    (1997, 9, 27, 'Perognathus', 'flavus')
+    (1997, 9, 27, 'Perognathus', 'flavus')
+    (1997, 9, 27, 'Perognathus', 'flavus')
+    (1997, 9, 27, 'Perognathus', 'flavus')
+    (1997, 9, 27, 'Perognathus', 'flavus')
+    (1997, 9, 28, 'Perognathus', 'flavus')
+    (1997, 9, 28, 'Perognathus', 'flavus')
+    (1997, 9, 28, 'Perognathus', 'flavus')
+    (1997, 9, 28, 'Perognathus', 'flavus')
+    (1996, 10, 12, 'Perognathus', 'flavus')
+    (1996, 10, 12, 'Perognathus', 'flavus')
+    (1996, 10, 12, 'Perognathus', 'flavus')
+    (1996, 10, 12, 'Perognathus', 'flavus')
+    (1996, 10, 12, 'Perognathus', 'flavus')
+    (1996, 10, 12, 'Perognathus', 'flavus')
+    (1996, 10, 12, 'Perognathus', 'flavus')
+    (1996, 10, 12, 'Perognathus', 'flavus')
+    (1996, 10, 12, 'Perognathus', 'flavus')
+    (1996, 10, 12, 'Perognathus', 'flavus')
+    (1996, 10, 12, 'Perognathus', 'flavus')
+    (1996, 10, 12, 'Perognathus', 'flavus')
+    (1996, 10, 13, 'Perognathus', 'flavus')
+    (1996, 10, 13, 'Perognathus', 'flavus')
+    (1996, 10, 13, 'Perognathus', 'flavus')
+    (1996, 10, 13, 'Perognathus', 'flavus')
+    (1996, 10, 13, 'Perognathus', 'flavus')
+    (1996, 10, 13, 'Perognathus', 'flavus')
+    (1996, 10, 13, 'Perognathus', 'flavus')
+    (1996, 10, 13, 'Perognathus', 'flavus')
+    (1996, 10, 13, 'Perognathus', 'flavus')
+    (1996, 10, 13, 'Perognathus', 'flavus')
+    (1996, 10, 13, 'Perognathus', 'flavus')
+    (1996, 10, 13, 'Perognathus', 'flavus')
+    (1996, 10, 13, 'Perognathus', 'flavus')
+    (1996, 10, 13, 'Perognathus', 'flavus')
+    (1996, 10, 13, 'Perognathus', 'flavus')
+    (1997, 10, 25, 'Perognathus', 'flavus')
+    (1997, 10, 25, 'Perognathus', 'flavus')
+    (1997, 10, 25, 'Perognathus', 'flavus')
+    (1997, 10, 25, 'Perognathus', 'flavus')
+    (1997, 10, 25, 'Perognathus', 'flavus')
+    (1996, 11, 16, 'Perognathus', 'flavus')
+    (1996, 11, 16, 'Perognathus', 'flavus')
+    (1996, 11, 16, 'Perognathus', 'flavus')
+    (1996, 11, 16, 'Perognathus', 'flavus')
+    (1996, 11, 16, 'Perognathus', 'flavus')
+    (1996, 11, 17, 'Perognathus', 'flavus')
+    (1996, 11, 17, 'Perognathus', 'flavus')
+    (1996, 11, 17, 'Perognathus', 'flavus')
+    (1996, 11, 17, 'Perognathus', 'flavus')
+    (1996, 11, 17, 'Perognathus', 'flavus')
+    (1996, 11, 17, 'Perognathus', 'flavus')
+    (1996, 11, 17, 'Perognathus', 'flavus')
+    (1996, 11, 17, 'Perognathus', 'flavus')
+    (1996, 11, 17, 'Perognathus', 'flavus')
+    (1996, 11, 17, 'Perognathus', 'flavus')
+    (1996, 11, 17, 'Perognathus', 'flavus')
+    (1996, 11, 17, 'Perognathus', 'flavus')
+    (1996, 11, 17, 'Perognathus', 'flavus')
+    (1996, 11, 17, 'Perognathus', 'flavus')
+    (1996, 12, 18, 'Perognathus', 'flavus')
+    (1996, 12, 18, 'Perognathus', 'flavus')
+    (1996, 12, 18, 'Perognathus', 'flavus')
+    (1996, 12, 18, 'Perognathus', 'flavus')
+    (1996, 12, 18, 'Perognathus', 'flavus')
+    (1996, 12, 18, 'Perognathus', 'flavus')
+    (1996, 12, 18, 'Perognathus', 'flavus')
+    (1996, 12, 18, 'Perognathus', 'flavus')
+    (1996, 12, 18, 'Perognathus', 'flavus')
+    (1996, 12, 18, 'Perognathus', 'flavus')
+    (1996, 12, 18, 'Perognathus', 'flavus')
+    (1996, 12, 19, 'Perognathus', 'flavus')
+    (1996, 12, 19, 'Perognathus', 'flavus')
+    
+
+## SQL and Pandas
+
+**Challenge: modify last query to find surveys that were conducted in July or December in the year 1996, 1997, or 1998**
+
+
+```python
+import pandas as pd
+import sqlite3
+
+con = sqlite3.connect("portals_mammal.sqlite")
+
+sql = """
+select surveys.year, surveys.month, surveys.day, species.genus, species.species
+from surveys
+join species
+on surveys.species_id = species.species_id
+where species.species = "flavus"
+and surveys.year > 2000
+"""
+
+df = pd.read_sql_query(sql, con)
+print(df.head())
+con.close()
+```
+
+       year  month  day        genus species
+    0  2002      2    9  Perognathus  flavus
+    1  2002      2   10  Perognathus  flavus
+    2  2002      3   14  Perognathus  flavus
+    3  2002      3   14  Perognathus  flavus
+    4  2002      3   14  Perognathus  flavus
+    
+
+## Creating a SQL table with pandas
+
+
+```python
+import pandas as pd
+import sqlite3
+
+con = sqlite3.connect("portals_mammal.sqlite")
+# load the data into a DataFrame
+survey_df = pd.read_sql_query("select * from surveys", con)
+
+# Select only data from 2002
+surveys2002 = survey_df[survey_df.year == 2002]
+
+# Write the new dataframe to a new sqlite 
+surveys2002.to_sql("surveys2002", con, if_exists="replace")
+
+```
+
+
+```python
+df = pd.read_sql_query("select * from surveys2002", con)
+print(df.head())
+con.close()
+```
+
+       index  record_id  month  day  year  plot_id species_id   sex  \
+    0  33320      33321      1   12  2002        1         DM     M   
+    1  33321      33322      1   12  2002        1         DO     M   
+    2  33322      33323      1   12  2002        1         PB     M   
+    3  33323      33324      1   12  2002        1         AB  None   
+    4  33324      33325      1   12  2002        1         DO     M   
+    
+       hindfoot_length  weight  
+    0             38.0    44.0  
+    1             37.0    58.0  
+    2             28.0    45.0  
+    3              NaN     NaN  
+    4             35.0    29.0  
+    
